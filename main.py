@@ -288,6 +288,47 @@ class Ximalaya:
                 print(colorama.Fore.RED + f'声音{failed_download[0]}下载失败！')
         await session.close()
 
+    # 下载专辑中的选定声音
+    async def get_selected_sounds_info(self, sounds, start, end, headers):
+        tasks = []
+        global_retries = 0
+        max_global_retries = 2
+        session = aiohttp.ClientSession()
+        digits = len(str(len(sounds)))
+        for i in range(start - 1, end):
+            sound_id = sounds[i]["trackId"]
+            tasks.append(asyncio.create_task(self.async_analyze_sound(sound_id, session, headers)))
+        sounds_info = await asyncio.gather(*tasks)
+        # tasks = []
+        # if number:
+        #     num = start
+        #     for sound_info in sounds_info:
+        #         if sound_info is False or sound_info == 0:
+        #             continue
+        #         num_ = str(num).zfill(digits)
+        #         if quality == 2 and sound_info[2] == "":
+        #              quality = 1
+        #         tasks.append(asyncio.create_task(self.async_get_sound(sound_info["name"], sound_info[quality], album_name, session, path, global_retries, num_)))
+        #         num += 1
+        # else:
+        #     for sound_info in sounds_info:
+        #         if sound_info is False or sound_info == 0:
+        #             continue
+        #         if quality == 2 and sound_info[2] == "":
+        #             quality = 1
+        #         tasks.append(asyncio.create_task(self.async_get_sound(sound_info["name"], sound_info[quality], album_name, session, path, global_retries)))
+        # failed_downloads = [result for result in await asyncio.gather(*tasks) if result is not None]
+        # while failed_downloads and global_retries < max_global_retries:
+        #     tasks = [asyncio.create_task(self.async_get_sound(*failed_download)) for failed_download in failed_downloads]
+        #     failed_downloads = [result for result in await asyncio.gather(*tasks) if result is not None]
+        #     global_retries += 1
+        # print("专辑全部选定声音下载完成！")
+        # if failed_downloads:
+        #     for failed_download in failed_downloads:
+        #         print(colorama.Fore.RED + f'声音{failed_download[0]}下载失败！')
+        await session.close()
+        return sounds_info
+
     # 解密vip声音url
     def decrypt_url(self, encrypted_url):
         o = bytes([183, 174, 108, 16, 131, 159, 250, 5, 239, 110, 193, 202, 153, 137, 251, 176, 119, 150, 47, 204, 97, 237, 1, 71, 177, 42, 88, 218, 166, 82, 87, 94, 14, 195, 69, 127, 215, 240, 225, 197, 238, 142, 123, 44, 219, 50, 190, 29, 181, 186, 169, 98, 139, 185, 152, 13, 141, 76, 6, 157, 200, 132, 182, 49, 20, 116, 136, 43, 155, 194, 101, 231, 162, 242, 151, 213, 53, 60, 26, 134, 211, 56, 28, 223, 107, 161, 199, 15, 229, 61, 96, 41, 66, 158, 254, 21, 165, 253, 103, 89, 3, 168, 40, 246, 81, 95, 58, 31, 172, 78, 99, 45, 148, 187, 222, 124, 55, 203, 235, 64, 68, 149, 180, 35, 113, 207, 118, 111, 91, 38, 247, 214, 7, 212, 209, 189, 241, 18, 115, 173, 25, 236, 121, 249, 75, 57, 216, 10, 175, 112, 234, 164, 70, 206, 198, 255, 140, 230, 12, 32, 83, 46, 245, 0, 62, 227, 72, 191, 156, 138, 248, 114, 220, 90, 84, 170, 128, 19, 24, 122, 146, 80, 39, 37, 8, 34, 22, 11, 93, 130, 63, 154, 244, 160, 144, 79, 23, 133, 92, 54, 102, 210, 65, 67, 27, 196, 201, 106, 143, 52, 74, 100, 217, 179, 48, 233, 126, 117, 184, 226, 85, 171, 167, 86, 2, 147, 17, 135, 228, 252, 105, 30, 192, 129, 178, 120, 36, 145, 51, 163, 77, 205, 73, 4, 188, 125, 232, 33, 243, 109, 224, 104, 208, 221, 59, 9])

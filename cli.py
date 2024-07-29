@@ -191,6 +191,48 @@ if __name__ == "__main__":
                 elif choice == "3":
                     for sound in sounds:
                         print(f"{sound['index']}. {sound['title']}")
+                    start = 1
+                    end = len(sounds)
+                    sounds_info = loop.run_until_complete(ximalaya.get_selected_sounds_info(sounds, start, end, headers))
+                    
+                    print(sounds_info)
+                    with open(f"{album_name}-orignal.json", "w") as f:
+                        json.dump(sounds_info, f, ensure_ascii=False, indent=4)
+                    musics = []
+                    musics_mp3 = []
+                    for sound in sounds_info[::-1]:
+                        if sound[2]:
+                            musics.append({
+                                "name": sound['name'],
+                                "url": sound[2]
+                            })
+                        elif sound[1]:
+                            musics.append({
+                                "name": sound['name'],
+                                "url": sound[1]
+                            })
+                            music_mp3 = {
+                                "name": sound['name'],
+                                "url": sound[1]
+                            }
+                        else:
+                            musics.append({
+                                "name": sound['name'],
+                                "url": sound[0]
+                            })
+                    json_str = {
+                        "name": album_name,
+                        "musics": musics
+                    }
+                    with open(f"{album_name}.json", "w") as f:
+                        json.dump(json_str, f, ensure_ascii=False, indent=4)     
+                        
+                    mp3_json_str = {
+                        "name": album_name,
+                        "musics": music_mp3
+                    }
+                    with open(f"{album_name}-mp3.json", "w") as f:
+                        json.dump(mp3_json_str, f, ensure_ascii=False, indent=4)                        
                 else:
                     print("无效的选择，请重新输入。")
         elif choice == "3":
